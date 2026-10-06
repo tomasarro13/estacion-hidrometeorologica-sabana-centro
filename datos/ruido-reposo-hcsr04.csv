@@ -1,0 +1,14 @@
+# Ruido del HC-SR04 con superficie en reposo
+# Sensor fijo, sin perturbacion. Distancia a la superficie, en cm.
+# Usado en: Wiki seccion 8.2
+n,distancia_cm
+1,8.48
+2,8.42
+3,8.06
+4,8.00
+5,7.55
+6,8.31
+7,7.89
+8,8.00
+9,8.43
+10,8.43

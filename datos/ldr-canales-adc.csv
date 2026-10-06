@@ -1,0 +1,10 @@
+# Verificacion del LDR sobre los canales del ADC1
+# Solo GPIO 34 tiene el sensor conectado; el resto flota con ruido.
+# Usado en: Wiki seccion 8.1
+gpio,lectura_cruda,nota
+32,429,flotante
+33,178,flotante
+34,1949,LDR conectado
+35,70,flotante
+36,0,flotante
+39,0,flotante

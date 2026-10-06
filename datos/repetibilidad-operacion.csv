@@ -1,0 +1,12 @@
+# Muestras consecutivas del sistema en operacion normal (periodo 2 s)
+# Capturadas del puerto serie. BMP280 ausente: presion es valor supuesto.
+# Usado en: Wiki secciones 8.3, 8.4 y 8.5
+n,nivel_cm,dispersion_cm,temp_C,humedad_pct,presion_hPa,luz_pct,evap_mm_dia,qc,calidad_hex
+1,27.1,0.02,22.7,59.3,750,43,4.15,1,0x00
+2,27.1,0.02,22.7,59.2,750,43,4.15,1,0x00
+3,27.1,0.02,22.7,59.2,750,43,4.15,1,0x00
+4,27.1,0.00,22.7,59.2,750,43,4.14,1,0x00
+5,27.1,0.03,22.7,59.3,750,44,4.15,1,0x00
+6,27.2,0.02,22.6,59.3,750,43,4.13,1,0x00
+7,27.1,0.02,22.6,59.3,750,43,4.14,1,0x00
+8,27.1,0.02,22.6,59.2,750,43,4.13,1,0x00
