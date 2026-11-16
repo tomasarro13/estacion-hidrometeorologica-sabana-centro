@@ -1,0 +1,26 @@
+# /etc/mosquitto/estacion.acl
+# Lista de control de acceso por usuario.
+
+# El nodo solo publica en su propia rama y solo lee sus comandos.
+user nodo01
+topic write sabana/nodo01/telemetria
+topic write sabana/nodo01/alerta
+topic write sabana/nodo01/estado
+topic write sabana/nodo01/ack
+topic read  sabana/nodo01/cmd/#
+
+# El Gateway lee todo lo que publican los nodos y escribe comandos,
+# agregados, predicciones y su propio estado.
+user gateway
+topic read  sabana/+/telemetria
+topic read  sabana/+/alerta
+topic read  sabana/+/estado
+topic read  sabana/+/ack
+topic write sabana/+/cmd/#
+topic write sabana/+/agregado
+topic write sabana/+/prediccion
+topic write sabana/gateway/estado
+
+# Usuario de solo lectura para diagnóstico con mosquitto_sub
+user monitor
+topic read sabana/#

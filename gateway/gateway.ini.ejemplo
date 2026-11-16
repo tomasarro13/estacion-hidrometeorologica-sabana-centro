@@ -1,0 +1,55 @@
+; =====================================================================
+;  Configuración del Gateway · Challenge #3
+;  Copiar como gateway.ini y completar. gateway.ini NO se sube al repo.
+;
+;  Los secretos también pueden darse por variables de entorno, que
+;  tienen prioridad sobre este archivo:
+;     UBIDOTS_TOKEN      token de la cuenta de Ubidots
+;     MQTT_LOCAL_CLAVE   clave del usuario "gateway" en Mosquitto
+;     GEMINI_API_KEY     clave de la API generativa (opcional)
+; =====================================================================
+
+[local]
+; Broker Mosquitto en la misma Raspberry
+host = localhost
+puerto = 1883
+usuario = gateway
+clave = CAMBIAR
+id_cliente = gateway
+base_topicos = sabana
+
+[nube]
+activa = si
+host = industrial.api.ubidots.com
+; 8883 con tls = si cifra el token en tránsito. Si la red del sitio
+; bloquea ese puerto: puerto = 1883 y tls = no.
+puerto = 8883
+tls = si
+token = CAMBIAR
+; Etiqueta (API label) del dispositivo en Ubidots
+dispositivo = estacion-sabana
+; Variable del interruptor "Silenciar alarma" del tablero global
+variable_comando = silenciar
+; Nodo que recibe los comandos del tablero global
+nodo_comandos = nodo01
+; Ubidots admite 1 mensaje por segundo por token
+intervalo_s = 1.0
+
+[almacen]
+ruta = /var/lib/estacion/gateway.db
+dias_lecturas = 7
+
+[procesamiento]
+; Ventana de agregación. Con 300 s salen 2 880 datos/día, dentro de
+; los 4 000 del plan gratuito de Ubidots.
+ventana_s = 300
+
+[ia]
+; Corre cada 6 ventanas = cada 30 min
+cada_ventanas = 6
+ventana_larga_h = 24
+ventana_corta_h = 3
+; Capa generativa (requiere GEMINI_API_KEY). Sin clave o sin Internet,
+; la recomendación sale por reglas.
+generativa = si
+lugar = Sabana Centro

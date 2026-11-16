@@ -1,74 +1,107 @@
 # Estación hidrometeorológica para alerta temprana de desabastecimiento hídrico
-### Challenge #2 · Internet de las Cosas · Sabana Centro, Cundinamarca
+
+**Challenge #3 · Internet de las Cosas · Sabana Centro, Cundinamarca · 2026-2**
+
+Santiago Barrera · Tomás Ariza · Andrés Camilo Beltrán
 
 ---
 
-## Resumen general
+## De un nodo a un ecosistema
 
-Durante 2026, la confirmación oficial del inicio anticipado del Fenómeno de El Niño por parte del Gobierno Nacional y el IDEAM extremó las vulnerabilidades hidrológicas de la Sabana de Bogotá, y la CAR identificó formalmente 20 municipios de Cundinamarca en riesgo extremo por desabastecimiento hídrico [1], [2].
+El Challenge #2 entregó una estación **autónoma**: mide el nivel del agua y el clima que la evapora, valida sus lecturas, decide y hace sonar una alarma sin depender de nadie.
 
-Este proyecto desarrolla un **prototipo funcional de bajo costo** que mide de forma continua el nivel de un cuerpo de agua junto con las variables meteorológicas que gobiernan su pérdida por evaporación, combina esas señales mediante una **lógica de fusión multivariable** y emite alertas tempranas en dos canales independientes: una **alarma física in situ** y un **tablero de control** servido desde un servidor web embebido en la propia WLAN, sin broker ni dependencia de Internet.
+El Challenge #3 la convierte en el primer nodo de una cadena de cuatro capas, para resolver lo que un nodo solo no puede: **avisar a quien no está en el sitio, recordar, y anticipar.**
 
-El dispositivo mide siete variables —seis instrumentadas y una derivada— con un costo de materiales inferior a $250.000 COP, y opera de forma autónoma: si la red cae, sigue midiendo, decidiendo y alarmando.
+```
+  DISPOSITIVO              GATEWAY                  NUBE               AUTORIDAD
+  ESP32            MQTT    Raspberry Pi     MQTT    Ubidots
+  7 variables    ───────►  Mosquitto      ───────►  Tablero global ──►  en cualquier
+  fusión · QARTOD          SQLite                   Notificaciones      lugar de
+  alarma física  ◄───────  Procesamiento  ◄───────  Interruptor         Colombia
+  tablero local    orden   Módulo de IA     orden
+```
 
----
-
-## La idea central del diseño
-
-> **Un nodo que deja de funcionar cuando se cae la red no sirve para alertar de una emergencia.**
-
-Esa premisa ordena todas las decisiones de arquitectura. La inteligencia vive en el dispositivo: valida sus propias lecturas, aplica la lógica de fusión, decide si hay alerta y acciona su alarma sin consultar a nadie. La red es un canal adicional de visualización, no un requisito de operación.
-
-Es también la razón por la cual el enunciado prohíbe MQTT, y una restricción que el equipo asume como criterio de diseño y no como limitación: un broker exige una máquina encendida permanentemente, lo que introduce costo, consumo y un punto único de falla en un sistema cuya función es avisar cuando algo va mal.
-
----
-
-## Variables monitoreadas
-
-| Variable | Origen | Instrumento |
+| Capa | Qué aporta | Si falla |
 |---|---|---|
-| Nivel del agua | Medida | HC-SR04 (ultrasónico, sin contacto) |
-| Caudal | Derivada del nivel | Curva de gasto calibrada |
-| Temperatura del aire | Medida | DHT22 |
-| Humedad relativa | Medida | DHT22 |
-| Presión atmosférica | Medida | BMP280 |
-| Radiación solar | Estimada | LDR + Ångström-Prescott |
-| **Evaporación potencial** | **Derivada** | **Penman-Monteith FAO-56** |
+| **Dispositivo** | Decide y alarma en 6 s, sin red | — |
+| **Gateway** | Guarda todo, resume, predice, sostiene los datos sin Internet | El nodo sigue alarmando y sirviendo su tablero local |
+| **Nube** | Llega a quien decide, esté donde esté; notifica | Los datos esperan en disco y se reenvían |
 
-La evaporación potencial es la variable que justifica todo el sistema: no se mide con ningún sensor, se infiere del cruce de las otras cuatro. Es la expresión más clara del valor de un ecosistema IoT frente a un conjunto de sensores aislados.
+> **Agregar tres capas no puede hacer al sistema menos confiable que antes.** Ninguna función de seguridad se movió hacia arriba. El Gateway y la nube amplían lo que el nodo hace; no lo reemplazan.
 
 ---
 
-## Estructura de la documentación
+## Estado de esta entrega
 
-| Página | Contenido |
+| | |
 |---|---|
-| **[1. Introducción](1.-Introduccion)** | Motivación, justificación, problema y pregunta guía |
-| **[2. Restricciones de diseño](2.-Restricciones-de-diseno)** | Técnicas, económicas, regulatorias, de espacio, escalabilidad y temporales |
-| **[3. Arquitectura](3.-Arquitectura)** | Diagramas de bloques de hardware y software, UML, esquemático |
-| **[4. Diseño modular](4.-Diseno-modular)** | Criterios de diseño y estándares de ingeniería aplicados por módulo |
-| **[5. Lógica de fusión y umbrales](5.-Logica-de-fusion-y-umbrales)** | Fundamentación normativa de cada parámetro |
-| **[6. Implementación](6.-Implementacion)** | Hardware, firmware, carcasa, alimentación y despliegue |
-| **[7. Banco de pruebas](7.-Banco-de-pruebas)** | Protocolo experimental completo |
-| **[8. Resultados y análisis](8.-Resultados-y-analisis)** | Calibración, validación de alertas, robustez y desempeño |
-| **[9. Autoevaluación del protocolo](9.-Autoevaluacion-del-protocolo)** | Crítica de la propia metodología de pruebas |
-| **[10. Mejoras respecto al Challenge #1](10.-Mejoras-respecto-al-Challenge-1)** | Deficiencias corregidas y evidencia |
-| **[11. Modelo de negocio](11.-Modelo-de-negocio)** | Viabilidad, costos y stakeholders |
-| **[12. Conclusiones y trabajo futuro](12.-Conclusiones-y-trabajo-futuro)** | Retos enfrentados y siguientes pasos |
-| **[13. Roles y contribuciones](13.-Roles-y-contribuciones)** | Aporte de cada integrante |
-| **[14. Uso de herramientas de IA](14.-Uso-de-herramientas-de-IA)** | Declaración de transparencia |
-| **[15. Anexos](15.-Anexos)** | Código fuente documentado, esquemáticos y material complementario |
-| **[16. Referencias](16.-Referencias)** | Bibliografía en formato IEEE |
+| ✅ **Escrito y en el repositorio** | Firmware con cliente MQTT · Gateway · base de datos · módulo de IA · simulador · banco de pruebas |
+| ✅ **Ejecutado y medido en simulación** | Broker Mosquitto real, Gateway real, SQLite real y módulo de IA real, contra un nodo y una nube emulados. Nueve pruebas, todas las cifras en [C3.8](C3.8-Resultados-y-analisis) |
+| ⏳ **Pendiente: prototipo físico** | Firmware nuevo en el ESP32, Raspberry Pi, cuenta de Ubidots, capa generativa de la IA. Doce pruebas definidas en [C3.7 §7.6](C3.7-Configuracion-experimental). **Se demuestran en la sustentación** |
+
+Esta documentación reporta una **validación por simulación** y lo dice en cada lugar donde aparece un número. No contiene ninguna cifra presentada como medición del prototipo que no lo sea. Lo que la simulación no puede probar está en [C3.9](C3.9-Autoevaluacion-del-protocolo).
+
+---
+
+## Resultados principales (simulación)
+
+| Qué se probó | Resultado en simulación | Detalle |
+|---|---|---|
+| Integridad nodo → SQLite → nube | **457 200 de 457 200** mensajes en SQLite; cero agregados perdidos o duplicados | [§8.1](C3.8-Resultados-y-analisis) |
+| Presupuesto de la plataforma (4 000 datos/día) | Máximo **3 046 datos/día** | [§8.1](C3.8-Resultados-y-analisis) |
+| Caída de Internet de 8 h | **0 perdidos, 0 duplicados**; la bandeja llegó a 118 mensajes y se vació sola | [§8.5](C3.8-Resultados-y-analisis) |
+| Control de acceso del broker | **10 de 10** casos | [§8.2](C3.8-Resultados-y-analisis) |
+| Silenciar la alarma desde el tablero global, con salvaguardas | **10 de 10** comprobaciones; una orden vieja no se ejecuta | [§8.6](C3.8-Resultados-y-analisis) |
+| IA · falsas anomalías | **0** en 501 corridas | [§8.9](C3.8-Resultados-y-analisis) |
+| IA · fuga de 3 mm/h | Detectada **1,0 h** después de empezar, **11,5 h** antes de cruzar el umbral | [§8.9](C3.8-Resultados-y-analisis) |
+| IA · predicción del cruce por sequía, con un día de historia | Error medio de **2,23 h** | [§8.9](C3.8-Resultados-y-analisis) |
+| ⚠️ Hallazgo sobre el nodo | La alerta amarilla se activa sin que el nivel esté bajo: **10 veces en 24 h** en el escenario estable | [§8.10](C3.8-Resultados-y-analisis) |
+
+---
+
+## El módulo de IA en una frase
+
+**El nivel baja. ¿Racionar, o mandar una cuadrilla?**
+
+Un descenso por evaporación y uno por fuga se ven igual en un medidor de nivel y piden decisiones opuestas. El módulo cruza horas de historia del nivel con la evaporación que el nodo estima, y entrega tres cosas: **cuánto tiempo queda** hasta el umbral, **si el clima explica** el descenso, y **qué hacer**.
+
+Un método estadístico auditable hace la cuenta. Un modelo generativo, con respaldo por reglas, redacta la recomendación. Cada parte del problema recibió la herramienta que le corresponde: [C3.5](C3.5-Modulo-de-IA).
+
+---
+
+## Documentación del Challenge #3
+
+| Numeral del enunciado | Página |
+|---|---|
+| **(1)** Resumen, motivación, justificación, estructura | [C3.1 · Resumen, motivación y justificación](C3.1-Resumen-motivacion-y-justificacion) |
+| **(2)** Restricciones de diseño | [C3.2 · Restricciones de diseño](C3.2-Restricciones-de-diseno) |
+| **(2)** Arquitectura · diagramas de bloques · UML de la solución | [C3.3 · Arquitectura](C3.3-Arquitectura) |
+| **(2)** Desarrollo modular · criterios · UML por módulo · estándares | [C3.4 · Diseño modular](C3.4-Diseno-modular) |
+| **(2)** Módulo de Inteligencia Artificial | [C3.5 · Módulo de IA](C3.5-Modulo-de-IA) |
+| **(2)** Esquemático e implementación | [C3.6 · Implementación](C3.6-Implementacion) |
+| **(2)** Modelo de negocio | [C3.10 · Modelo de negocio](C3.10-Modelo-de-negocio) |
+| **(3)** Configuración experimental | [C3.7 · Configuración experimental](C3.7-Configuracion-experimental) |
+| **(3)** Resultados y análisis | [C3.8 · Resultados y análisis](C3.8-Resultados-y-analisis) |
+| **(4)** Autoevaluación del protocolo de pruebas | [C3.9 · Autoevaluación del protocolo](C3.9-Autoevaluacion-del-protocolo) |
+| **(5)** Conclusiones, retos, trabajo futuro | [C3.11 · Conclusiones, retos y trabajo futuro](C3.11-Conclusiones-retos-y-trabajo-futuro) |
+| **(5)** Referencias | [C3.15 · Referencias](C3.15-Referencias) |
+| **(6)** Anexos · código documentado · **(7)** video | [C3.14 · Anexos](C3.14-Anexos) |
+| Roles y contribuciones | [C3.12 · Roles y contribuciones](C3.12-Roles-y-contribuciones) |
+| Declaración de uso de IA | [C3.13 · Uso de herramientas de IA](C3.13-Uso-de-herramientas-de-IA) |
+
+## Documentación del Challenge #2 (el nodo)
+
+El hardware, la medición, las pruebas QARTOD, la lógica de fusión, los umbrales, la alarma y el tablero local **no cambiaron**. Su documentación sigue vigente: [resumen del Challenge #2](Estación-hidrometeorológica-para-alerta-temprana-de-desabastecimiento-hídrico) y páginas 1 a 16 de la barra lateral.
 
 ---
 
 ## Equipo
 
-| Integrante | Rol |
+| Integrante | Frente en el Challenge #3 |
 |---|---|
-| Santiago Barrera | Líder técnico · Firmware y concurrencia |
-| Tomás Ariza | Líder técnico · Servidor web y tablero |
-| Andrés Camilo Beltrán | Documentación, integración física y comunicación |
+| Santiago Barrera | Dispositivo e Inteligencia Artificial |
+| Tomás Ariza | Gateway y datos |
+| Andrés Camilo Beltrán | Nube, validación y documentación |
 
-**Repositorio:** `github.com/tomasarro13/estacion-hidrometeorologica-sabana-centro`
-**Sustentación:** 1 de octubre de 2026
+**Repositorio:** https://github.com/tomasarro13/estacion-hidrometeorologica-sabana-centro
+**Entrega de la documentación:** 16 de noviembre de 2026 · **Sustentación:** 19 de noviembre de 2026

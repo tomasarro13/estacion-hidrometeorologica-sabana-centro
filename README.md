@@ -1,6 +1,12 @@
 # Estación hidrometeorológica para alerta temprana de desabastecimiento hídrico
 
-**Challenge #2 · Internet de las Cosas · Sabana Centro, Cundinamarca · 2026**
+**Challenge #3 · Internet de las Cosas · Sabana Centro, Cundinamarca · 2026-2**
+
+> **Challenge #3: de un nodo a un ecosistema.** La estación del Challenge #2 es ahora el primer nodo de una cadena de cuatro capas: **ESP32 → Raspberry Pi (Mosquitto + SQLite + procesamiento + IA) → Ubidots → autoridad**, con MQTT en los dos tramos y un canal de órdenes en sentido contrario. Ver [Challenge #3](#challenge-3--ecosistema-iot) más abajo.
+>
+> **Estado:** software completo y **validado por simulación** (broker, Gateway, SQLite e IA reales; nodo y nube emulados). La integración sobre el hardware se demuestra en la sustentación.
+
+## El nodo (Challenge #2)
 
 Prototipo funcional de bajo costo que monitorea el nivel de un cuerpo de agua junto con las variables meteorológicas que gobiernan su pérdida por evaporación, combina esas señales mediante lógica de fusión multivariable y emite alertas tempranas por dos canales independientes: alarma física *in situ* y tablero de control servido desde un servidor web embebido en la WLAN local, sin broker ni dependencia de Internet.
 
@@ -56,18 +62,70 @@ Ningún parámetro del firmware se escogió a ojo. Los trece valores críticos s
 
 ---
 
+## Challenge #3 · Ecosistema IoT
+
+```
+ DISPOSITIVO            GATEWAY                 NUBE              AUTORIDAD
+ ESP32          MQTT    Raspberry Pi     MQTT   Ubidots
+ 7 variables  ───────►  Mosquitto      ───────► Tablero global ──► en cualquier
+ fusión                 SQLite                  Notificaciones     lugar de
+ alarma física ◄─────── Procesamiento  ◄─────── Interruptor        Colombia
+ tablero local  orden   Módulo de IA    orden
+```
+
+| Capa | Qué hace | Carpeta |
+|---|---|---|
+| **Dispositivo** | Todo lo del Challenge #2 + cliente MQTT en un hilo propio | `firmware/EstacionHidroMQTT/` |
+| **Gateway** | Recibe, valida, guarda en SQLite, agrega por ventanas de 5 min, reenvía a la nube tras caídas de Internet, baja las órdenes | `gateway/` |
+| **Módulo de IA** | Predice el tiempo al umbral, distingue un descenso por evaporación de uno que el clima no explica, y redacta una recomendación | `ia/` |
+| **Validación** | Nodo ESP32 emulado y banco de nueve pruebas | `simulador/` · `pruebas/` |
+
+### Poner en marcha la Raspberry
+
+Guía paso a paso, con una verificación al final de cada paso: **[`gateway/README.md`](gateway/README.md)**
+
+### Repetir la validación por simulación
+
+```bash
+sudo apt install mosquitto python3-paho-mqtt      # o: pip install paho-mqtt
+python3 pruebas/ejecutar_pruebas.py                # ~10 min · escribe datos/ch3-simulacion/
+python3 pruebas/generar_reporte.py                 # la página de resultados de la Wiki
+```
+
+### Probar el Gateway sin el ESP32
+
+```bash
+python3 simulador/simulador.py --escenario fuga --clave 'CLAVE_DEL_NODO' --ritmo 200
+```
+
+Documentación completa del Challenge #3: páginas **C3.1 a C3.15** de la [Wiki](../../wiki).
+
+---
+
 ## Contenido del repositorio
 
 ```
 .
 ├── firmware/
-│   ├── EstacionHidro/        Firmware principal
+│   ├── EstacionHidroMQTT/    Challenge #3 · firmware con cliente MQTT
+│   ├── EstacionHidro/        Challenge #2 · firmware autónomo (sin MQTT)
 │   │   ├── EstacionHidro.ino   Tareas, ISR, fusión, servidor web
 │   │   ├── config.h            Parámetros ajustables documentados
 │   │   └── pagina.h            Tablero embebido en PROGMEM
 │   └── Diagnostico/          Sketch de verificación de hardware
+├── gateway/                  Challenge #3 · Gateway (Raspberry Pi)
+│   ├── gateway.py              Orquestador
+│   ├── almacen.py              SQLite
+│   ├── procesamiento.py        Validación y agregación
+│   ├── puente.py               Subida a la nube y bajada de órdenes
+│   ├── esquema.sql             Las cinco tablas
+│   ├── mosquitto/              Configuración y ACL del broker
+│   └── README.md               Puesta en marcha
+├── ia/                       Challenge #3 · módulo de IA
+├── simulador/                Challenge #3 · nodo ESP32 emulado
+├── pruebas/                  Challenge #3 · banco de pruebas y reporte
 ├── imagenes/                 Fotografías del prototipo y capturas
-├── datos/                    Series de calibración y línea base
+├── datos/                    Mediciones del Ch2 y resultados de simulación del Ch3
 ├── docs/                     Material complementario
 └── wiki/                     Copia de la Wiki (fuente markdown)
 ```
@@ -148,15 +206,15 @@ Todas requieren autenticación HTTP Basic.
 
 | Integrante | Rol |
 |---|---|
-| **Santiago Barrera** | Líder técnico · Firmware y concurrencia |
-| **Tomás Ariza** | Líder técnico · Servidor web y tablero |
-| **Andrés Camilo Beltrán** | Documentación, integración física y comunicación |
+| **Santiago Barrera** | Dispositivo e Inteligencia Artificial |
+| **Tomás Ariza** | Gateway y datos |
+| **Andrés Camilo Beltrán** | Nube, validación y documentación |
 
 ---
 
 ## Trabajos relacionados
 
-La extensión de este nodo a una **red distribuida de monitoreo** —LoRaWAN, gateway y broker MQTT, validada en Cisco Packet Tracer— se desarrolló en la Actividad de refuerzo 2.3, en un repositorio independiente.
+El diseño de conectividad de largo alcance para una red de varios nodos —LoRaWAN, gateway y broker MQTT, validado en Cisco Packet Tracer— se desarrolló en la Actividad de refuerzo 2.3, en un repositorio independiente. El Challenge #3 implementa el gateway y el broker sobre Wi-Fi.
 
 ---
 
