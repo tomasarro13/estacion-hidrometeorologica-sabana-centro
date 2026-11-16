@@ -1,0 +1,4 @@
+hora_sim,clasificacion,tasa_mmh,evap_mmh,exceso_mmh,horas_a_umbral,horas_a_rojo,prioridad,ventana_h,clase_ventana_corta,clase_ventana_larga,error_prediccion_h,origen_texto,recomendacion
+0.5,DATOS_INSUFICIENTES,,,,,,BAJA,3.0,DATOS_INSUFICIENTES,DATOS_INSUFICIENTES,,reglas,Aún no hay historia suficiente para estimar una tendencia. Mantener la vigilancia con el valor actual y las alertas del nodo.
+1.0,ESTABLE,0.0,0.058,-0.058,,,BAJA,24.0,ESTABLE,ESTABLE,,reglas,"Nivel estable, sin tendencia de descenso. No se requiere acción."
+1.5,ESTABLE,0.0,0.058,-0.058,,,BAJA,24.0,ESTABLE,ESTABLE,,reglas,"Nivel estable, sin tendencia de descenso. No se requiere acción."

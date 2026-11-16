@@ -3,3 +3,11 @@ Thumbs.db
 *.tmp
 build/
 wiki-repo/
+
+# Challenge 3: secretos y bases locales
+gateway/gateway.ini
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+*.pyc

@@ -1,0 +1,22 @@
+# /etc/systemd/system/gateway-estacion.service
+# Arranca el Gateway con la Raspberry y lo reinicia si se cae.
+[Unit]
+Description=Gateway IoT - Estacion hidrometeorologica (Challenge 3)
+After=network.target mosquitto.service
+Wants=mosquitto.service
+
+[Service]
+Type=simple
+User=estacion
+WorkingDirectory=/opt/estacion/gateway
+# Secretos fuera del repositorio: UBIDOTS_TOKEN, MQTT_LOCAL_CLAVE, GEMINI_API_KEY
+EnvironmentFile=-/etc/estacion/secretos.env
+ExecStart=/usr/bin/python3 /opt/estacion/gateway/gateway.py --config /etc/estacion/gateway.ini
+Restart=always
+RestartSec=5
+# SIGTERM = apagado ordenado: cierra ventanas abiertas y confirma la base
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

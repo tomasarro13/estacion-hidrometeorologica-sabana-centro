@@ -34,3 +34,19 @@ caso,tipo,etiqueta_verdadera,alarma_activada,resultado
 1,descenso_sostenido,evento,,
 2,pico_aislado,no_evento,,
 ```
+
+---
+
+## Challenge #3 · `ch3-simulacion/`
+
+> **Resultados de simulación, no mediciones.** Los genera `pruebas/ejecutar_pruebas.py`: broker Mosquitto, Gateway, SQLite y módulo de IA reales; nodo ESP32 y nube emulados.
+
+| Archivo | Contenido | Wiki |
+|---|---|---|
+| `resultados.json` | Todas las cifras de la validación y el entorno de la corrida | C3.8 |
+| `REPORTE.md` | La página de resultados, generada desde el JSON | C3.8 |
+| `integridad.csv` | Conteos por escenario | C3.8 §8.1 |
+| `latencia_nodo_gateway.csv` | 300 latencias nodo → SQLite | C3.8 §8.4 |
+| `reenvio_fases.csv` | Bandeja de salida antes, durante y después del corte de Internet | C3.8 §8.5 |
+| `ia_<escenario>.csv` | Línea de tiempo del módulo de IA | C3.8 §8.9 |
+| `verdad_<escenario>.csv` | Estado real del **modelo** (no del prototipo), cada 5 min | C3.8 §8.9 |

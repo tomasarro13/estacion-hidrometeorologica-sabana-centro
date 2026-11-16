@@ -1,0 +1,826 @@
+{
+  "pruebas": {
+    "S2_acceso": {
+      "casos": [
+        {
+          "caso": "Conexión anónima (sin usuario)",
+          "esperado": "rechazado",
+          "obtenido": "rechazado",
+          "pasa": true
+        },
+        {
+          "caso": "Usuario válido con clave incorrecta",
+          "esperado": "rechazado",
+          "obtenido": "rechazado",
+          "pasa": true
+        },
+        {
+          "caso": "Usuario inexistente",
+          "esperado": "rechazado",
+          "obtenido": "rechazado",
+          "pasa": true
+        },
+        {
+          "caso": "Usuario y clave correctos",
+          "esperado": "aceptado",
+          "obtenido": "aceptado",
+          "pasa": true
+        },
+        {
+          "caso": "nodo01 publica en la rama de nodo02",
+          "esperado": "bloqueado",
+          "obtenido": "bloqueado",
+          "pasa": true
+        },
+        {
+          "caso": "nodo01 se envía un comando a sí mismo",
+          "esperado": "bloqueado",
+          "obtenido": "bloqueado",
+          "pasa": true
+        },
+        {
+          "caso": "nodo01 suplanta el estado del Gateway",
+          "esperado": "bloqueado",
+          "obtenido": "bloqueado",
+          "pasa": true
+        },
+        {
+          "caso": "nodo01 lee datos agregados de la red",
+          "esperado": "bloqueado",
+          "obtenido": "bloqueado",
+          "pasa": true
+        },
+        {
+          "caso": "nodo01 recibe sus propios comandos",
+          "esperado": "entregado",
+          "obtenido": "entregado",
+          "pasa": true
+        },
+        {
+          "caso": "usuario de solo lectura envía un comando",
+          "esperado": "bloqueado",
+          "obtenido": "bloqueado",
+          "pasa": true
+        }
+      ],
+      "pasan": 10,
+      "total": 10
+    },
+    "S3_validacion": {
+      "malformados_enviados": 10,
+      "rechazados": 10,
+      "validos_enviados": 3,
+      "lecturas_guardadas": 3,
+      "gateway_siguio_operando": true,
+      "casos": [
+        {
+          "caso": "Texto que no es JSON",
+          "motivo_registrado": "JSON invalido"
+        },
+        {
+          "caso": "JSON truncado",
+          "motivo_registrado": "JSON invalido"
+        },
+        {
+          "caso": "JSON válido pero no es un objeto",
+          "motivo_registrado": "la carga no es un objeto JSON"
+        },
+        {
+          "caso": "Falta el consecutivo (seq)",
+          "motivo_registrado": "falta el campo 'seq'"
+        },
+        {
+          "caso": "Nivel no numérico",
+          "motivo_registrado": "'nivel' no es numerico"
+        },
+        {
+          "caso": "Humedad fuera de rango físico (150 %)",
+          "motivo_registrado": "'hr' fuera de rango fisico (150.0)"
+        },
+        {
+          "caso": "Bandera QARTOD inexistente (qc = 7)",
+          "motivo_registrado": "bandera qc fuera del esquema QARTOD"
+        },
+        {
+          "caso": "Estado de alerta desconocido",
+          "motivo_registrado": "estado de alerta desconocido"
+        },
+        {
+          "caso": "El id del mensaje no coincide con el tópico",
+          "motivo_registrado": "el id no coincide con el topico"
+        },
+        {
+          "caso": "Consecutivo negativo",
+          "motivo_registrado": "seq invalido"
+        }
+      ]
+    },
+    "S4_latencia": {
+      "nota": "Todo corre en una sola máquina (interfaz de lazo local). Mide el costo del software, no el de la red Wi-Fi ni el de Internet: es una cota inferior.",
+      "nodo_a_sqlite_ms": {
+        "n": 300,
+        "min": 0.23,
+        "mediana": 0.33,
+        "p95": 0.46,
+        "max": 24.33
+      },
+      "alerta_nodo_a_nube_ms": 0.9,
+      "comando_tablero_global_a_ack_ms": {
+        "n": 20,
+        "min": 1.05,
+        "mediana": 2.15,
+        "p95": 3.12,
+        "max": 3.12
+      }
+    },
+    "S6_comando": {
+      "pasos": [
+        {
+          "paso": "Estado inicial: nivel bajo el umbral rojo",
+          "esperado": "sonando",
+          "obtenido": "sonando",
+          "pasa": true
+        },
+        {
+          "paso": "Orden 'silenciar' desde el tablero global",
+          "esperado": "silenciada",
+          "obtenido": "silenciada",
+          "pasa": true
+        },
+        {
+          "paso": "El LED/estado sigue en ROJA (silenciar no oculta la condición)",
+          "esperado": "ROJA",
+          "obtenido": "ROJA",
+          "pasa": true
+        },
+        {
+          "paso": "Orden 'reactivar' desde el tablero global",
+          "esperado": "sonando",
+          "obtenido": "sonando",
+          "pasa": true
+        },
+        {
+          "paso": "Orden con 10 min de antigüedad (reenviada al reconectar)",
+          "esperado": "sonando",
+          "obtenido": "sonando",
+          "pasa": true
+        },
+        {
+          "paso": "  ...el Gateway la descarta y no llega al nodo",
+          "esperado": "no llega",
+          "obtenido": "no llega",
+          "pasa": true
+        },
+        {
+          "paso": "Orden con valor inválido (5)",
+          "esperado": "no llega",
+          "obtenido": "no llega",
+          "pasa": true
+        },
+        {
+          "paso": "Silenciar de nuevo",
+          "esperado": "silenciada",
+          "obtenido": "silenciada",
+          "pasa": true
+        },
+        {
+          "paso": "14 min después: el silencio sigue vigente",
+          "esperado": "silenciada",
+          "obtenido": "silenciada",
+          "pasa": true
+        },
+        {
+          "paso": "15,5 min después: el silencio expiró solo",
+          "esperado": "sonando",
+          "obtenido": "sonando",
+          "pasa": true
+        }
+      ],
+      "pasan": 10,
+      "total": 10,
+      "eventos_registrados": {
+        "ACK": 43,
+        "ALERTA": 4,
+        "COMANDO": 43,
+        "ESTADO_NODO": 2,
+        "GATEWAY": 2,
+        "NUBE": 2,
+        "RECHAZO": 2
+      },
+      "confirmaciones_de_silencio_en_nube": 4
+    },
+    "S5_reenvio": {
+      "fases": [
+        {
+          "fase": "1. Con Internet (4 h)",
+          "lecturas_en_sqlite": 7200,
+          "agregados_en_sqlite": 47,
+          "pendientes_de_envio": 0,
+          "agregados_en_nube": 47
+        },
+        {
+          "fase": "2. Sin Internet (8 h más)",
+          "lecturas_en_sqlite": 21600,
+          "agregados_en_sqlite": 143,
+          "pendientes_de_envio": 118,
+          "agregados_en_nube": 47
+        },
+        {
+          "fase": "3. Internet restablecido",
+          "lecturas_en_sqlite": 21600,
+          "agregados_en_sqlite": 143,
+          "pendientes_de_envio": 0,
+          "agregados_en_nube": 143
+        },
+        {
+          "fase": "4. Operación normal (2 h más)",
+          "lecturas_en_sqlite": 25200,
+          "agregados_en_sqlite": 167,
+          "pendientes_de_envio": 0,
+          "agregados_en_nube": 167
+        }
+      ],
+      "agregados_generados": 167,
+      "agregados_recibidos_en_nube": 167,
+      "perdidos": 0,
+      "duplicados": 0,
+      "llegaron_a_la_nube_durante_el_corte": 0,
+      "orden_cronologico_al_reenviar": true,
+      "segundos_hasta_ponerse_al_dia": 2.43,
+      "nota_tiempo": "Incluye la espera de reconexión (reintentos de 1 a 30 s). En simulación no se aplica el límite de 1 mensaje/s de la plataforma real (intervalo_s = 0): con el límite real, vaciar N mensajes toma N segundos.",
+      "eventos_nube_registrados": [
+        "conectada",
+        "desconectada",
+        "conectada",
+        "desconectada"
+      ]
+    },
+    "S7_caida_nodo": {
+      "keepalive_s": 15,
+      "segundos_hasta_detectar": 22.2,
+      "minimo_teorico_s": 22.5,
+      "secuencia_de_estados": [
+        "online",
+        "offline",
+        "online"
+      ],
+      "reinicios_de_nodo_detectados": 1,
+      "en_linea_publicado_en_nube": [
+        1,
+        0,
+        1
+      ]
+    },
+    "S8_reinicio_gateway": {
+      "publicados_por_el_nodo": 3857,
+      "recibidos_en_sqlite": 3029,
+      "no_recibidos_por_el_apagado": 828,
+      "perdidas_contadas_en_agregados": 828,
+      "mayor_hueco_en_una_ventana": 828,
+      "el_hueco_quedo_contabilizado": true,
+      "muestras_en_agregados": 3028,
+      "bitacora_gateway": [
+        "inicio",
+        "fin",
+        "inicio",
+        "fin"
+      ],
+      "nota": "La telemetría viaja con QoS 0: lo publicado mientras el Gateway está apagado no se recupera. El diseño no lo oculta: el hueco queda medido por el consecutivo."
+    },
+    "S1_integridad": [
+      {
+        "escenario": "estable",
+        "ruido_cm": 0.02,
+        "horas_simuladas": 24,
+        "publicados": 43200,
+        "en_sqlite": 43200,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 287,
+        "agregados": 287,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 357,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 357,
+        "agregados_con_nivel": 287,
+        "agregados_en_nube": 287,
+        "duplicados_nube": 0,
+        "datos_nube": 3007,
+        "datos_nube_por_dia": 3007,
+        "qc": {
+          "1": 42049,
+          "3": 1151
+        },
+        "lecturas_sin_nivel": 0,
+        "agregados_sin_nivel": 0,
+        "secuencia_alertas": [
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA"
+        ],
+        "pct_qc_sospechoso": 2.66,
+        "transiciones_alarma_nodo": 10,
+        "alarmas_por_10min": 0.069,
+        "eventos_alerta_gateway": 21,
+        "segundos_de_reloj": 28.8,
+        "mensajes_por_segundo": 1500
+      },
+      {
+        "escenario": "sequia",
+        "ruido_cm": 0.02,
+        "horas_simuladas": 72,
+        "publicados": 129600,
+        "en_sqlite": 129600,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 863,
+        "agregados": 863,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 1010,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 1010,
+        "agregados_con_nivel": 863,
+        "agregados_en_nube": 863,
+        "duplicados_nube": 0,
+        "datos_nube": 9063,
+        "datos_nube_por_dia": 3021,
+        "qc": {
+          "1": 126199,
+          "3": 3401
+        },
+        "lecturas_sin_nivel": 0,
+        "agregados_sin_nivel": 0,
+        "secuencia_alertas": [
+          "VERDE",
+          "AMARILLA"
+        ],
+        "pct_qc_sospechoso": 2.62,
+        "transiciones_alarma_nodo": 1,
+        "alarmas_por_10min": 0.002,
+        "eventos_alerta_gateway": 2,
+        "segundos_de_reloj": 86.4,
+        "mensajes_por_segundo": 1500
+      },
+      {
+        "escenario": "fuga",
+        "ruido_cm": 0.02,
+        "horas_simuladas": 30,
+        "publicados": 54000,
+        "en_sqlite": 54000,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 359,
+        "agregados": 359,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 442,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 442,
+        "agregados_con_nivel": 359,
+        "agregados_en_nube": 359,
+        "duplicados_nube": 0,
+        "datos_nube": 3807,
+        "datos_nube_por_dia": 3046,
+        "qc": {
+          "1": 52543,
+          "3": 1457
+        },
+        "lecturas_sin_nivel": 0,
+        "agregados_sin_nivel": 0,
+        "secuencia_alertas": [
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA"
+        ],
+        "pct_qc_sospechoso": 2.7,
+        "transiciones_alarma_nodo": 11,
+        "alarmas_por_10min": 0.061,
+        "eventos_alerta_gateway": 22,
+        "segundos_de_reloj": 36.0,
+        "mensajes_por_segundo": 1500
+      },
+      {
+        "escenario": "estable_ruido_alto",
+        "ruido_cm": 0.176,
+        "horas_simuladas": 24,
+        "publicados": 43200,
+        "en_sqlite": 43200,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 287,
+        "agregados": 287,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 357,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 357,
+        "agregados_con_nivel": 287,
+        "agregados_en_nube": 287,
+        "duplicados_nube": 0,
+        "datos_nube": 3007,
+        "datos_nube_por_dia": 3007,
+        "qc": {
+          "1": 25304,
+          "3": 17896
+        },
+        "lecturas_sin_nivel": 0,
+        "agregados_sin_nivel": 0,
+        "secuencia_alertas": [
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA"
+        ],
+        "pct_qc_sospechoso": 41.43,
+        "transiciones_alarma_nodo": 10,
+        "alarmas_por_10min": 0.069,
+        "eventos_alerta_gateway": 21,
+        "segundos_de_reloj": 28.8,
+        "mensajes_por_segundo": 1500
+      },
+      {
+        "escenario": "fuga_ruido_alto",
+        "ruido_cm": 0.176,
+        "horas_simuladas": 30,
+        "publicados": 54000,
+        "en_sqlite": 54000,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 359,
+        "agregados": 359,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 442,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 442,
+        "agregados_con_nivel": 359,
+        "agregados_en_nube": 359,
+        "duplicados_nube": 0,
+        "datos_nube": 3802,
+        "datos_nube_por_dia": 3042,
+        "qc": {
+          "1": 31689,
+          "3": 22311
+        },
+        "lecturas_sin_nivel": 0,
+        "agregados_sin_nivel": 0,
+        "secuencia_alertas": [
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA",
+          "VERDE",
+          "AMARILLA"
+        ],
+        "pct_qc_sospechoso": 41.32,
+        "transiciones_alarma_nodo": 11,
+        "alarmas_por_10min": 0.061,
+        "eventos_alerta_gateway": 22,
+        "segundos_de_reloj": 36.0,
+        "mensajes_por_segundo": 1500
+      },
+      {
+        "escenario": "sequia_ruido_alto",
+        "ruido_cm": 0.176,
+        "horas_simuladas": 72,
+        "publicados": 129600,
+        "en_sqlite": 129600,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 863,
+        "agregados": 863,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 1010,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 1010,
+        "agregados_con_nivel": 863,
+        "agregados_en_nube": 863,
+        "duplicados_nube": 0,
+        "datos_nube": 9056,
+        "datos_nube_por_dia": 3019,
+        "qc": {
+          "1": 76176,
+          "3": 53424
+        },
+        "lecturas_sin_nivel": 0,
+        "agregados_sin_nivel": 0,
+        "secuencia_alertas": [
+          "VERDE",
+          "AMARILLA"
+        ],
+        "pct_qc_sospechoso": 41.22,
+        "transiciones_alarma_nodo": 1,
+        "alarmas_por_10min": 0.002,
+        "eventos_alerta_gateway": 2,
+        "segundos_de_reloj": 86.4,
+        "mensajes_por_segundo": 1500
+      },
+      {
+        "escenario": "falla",
+        "ruido_cm": 0.02,
+        "horas_simuladas": 2,
+        "publicados": 3600,
+        "en_sqlite": 3600,
+        "perdidos": 0,
+        "ventanas_cerradas_esperadas": 23,
+        "agregados": 23,
+        "perdidas_contadas": 0,
+        "mensajes_encolados": 31,
+        "pendientes_al_final": 0,
+        "mensajes_en_nube": 31,
+        "agregados_con_nivel": 21,
+        "agregados_en_nube": 21,
+        "duplicados_nube": 0,
+        "datos_nube": 237,
+        "datos_nube_por_dia": 2844,
+        "qc": {
+          "1": 3234,
+          "3": 66,
+          "9": 300
+        },
+        "lecturas_sin_nivel": 300,
+        "agregados_sin_nivel": 2,
+        "secuencia_alertas": [
+          "VERDE",
+          "FALLA",
+          "VERDE"
+        ],
+        "pct_qc_sospechoso": 1.83,
+        "transiciones_alarma_nodo": 1,
+        "alarmas_por_10min": 0.083,
+        "eventos_alerta_gateway": 3,
+        "segundos_de_reloj": 2.4,
+        "mensajes_por_segundo": 1500
+      }
+    ],
+    "S9_ia": {
+      "estable": {
+        "corridas": 47,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "ESTABLE": 46
+        },
+        "hora_cruce_real_umbral": null,
+        "falsas_anomalias": 0,
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 6.9,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 6.9,
+          "hora_primera_alarma": 11.5,
+          "nivel_real_en_la_primera_alarma_cm": 20.0
+        },
+        "ultima_recomendacion": "Nivel estable, sin tendencia de descenso. No se requiere acción."
+      },
+      "sequia": {
+        "corridas": 143,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "DESCENSO_CLIMATICO": 142
+        },
+        "hora_cruce_real_umbral": 57.12,
+        "falsas_anomalias": 0,
+        "error_prediccion_cruce": {
+          "n": 113,
+          "error_abs_medio_h": 11.16,
+          "sesgo_medio_h": 5.5,
+          "anticipacion_0_6h": {
+            "n": 12,
+            "error_abs_medio_h": 0.56,
+            "error_abs_max_h": 1.32
+          },
+          "anticipacion_6_24h": {
+            "n": 36,
+            "error_abs_medio_h": 3.09,
+            "error_abs_max_h": 5.32
+          },
+          "anticipacion_mas_24h": {
+            "n": 65,
+            "error_abs_medio_h": 17.59,
+            "error_abs_max_h": 64.48
+          }
+        },
+        "comparacion_estimadores_24h": {
+          "theil_sen": {
+            "n": 67,
+            "error_abs_medio_h": 5.28,
+            "error_abs_max_h": 9.46,
+            "sesgo_medio_h": -0.68,
+            "tasa_min_mmh": -0.13,
+            "tasa_max_mmh": -0.08
+          },
+          "ciclo": {
+            "n": 67,
+            "error_abs_medio_h": 2.23,
+            "error_abs_max_h": 5.34,
+            "sesgo_medio_h": -2.0,
+            "tasa_min_mmh": -0.114,
+            "tasa_max_mmh": -0.106
+          }
+        },
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 84.0,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 63.4,
+          "hora_primera_alarma": 11.5,
+          "nivel_real_en_la_primera_alarma_cm": 12.48
+        },
+        "ultima_recomendacion": "El nivel baja 0.11 mm/h y la evaporación lo explica: es efecto del clima, no una pérdida. El nivel ya está bajo el umbral de alerta y llegaría al umbral crítico en unos 14 días. Preparar medidas de ahorro y avisar a los usuarios del sistema con anticipación."
+      },
+      "fuga": {
+        "corridas": 59,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "DESCENSO_CLIMATICO": 16,
+          "DESCENSO_NO_EXPLICADO": 42
+        },
+        "hora_cruce_real_umbral": 20.52,
+        "hora_inicio_fuga": 8,
+        "hora_primera_deteccion": 9.0,
+        "demora_deteccion_h": 1.0,
+        "anomalias_antes_de_la_fuga": 0,
+        "deteccion_sostenida_pct": 100.0,
+        "error_prediccion_cruce": {
+          "n": 24,
+          "error_abs_medio_h": 3.3,
+          "sesgo_medio_h": 3.18,
+          "anticipacion_0_6h": {
+            "n": 12,
+            "error_abs_medio_h": 0.07,
+            "error_abs_max_h": 0.12
+          },
+          "anticipacion_6_24h": {
+            "n": 12,
+            "error_abs_medio_h": 6.52,
+            "error_abs_max_h": 64.78
+          },
+          "anticipacion_mas_24h": null
+        },
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 36.9,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 5.6,
+          "hora_primera_alarma": 11.5,
+          "nivel_real_en_la_primera_alarma_cm": 14.83
+        },
+        "ultima_recomendacion": "El nivel baja 3.1 mm/h y la evaporación solo explica 0.1 mm/h: hay una pérdida de 3.0 mm/h que el clima no justifica. El nivel ya está bajo el umbral de alerta. Inspeccionar HOY el punto: fugas en la estructura, válvulas abiertas o captaciones no autorizadas."
+      },
+      "estable_ruido_alto": {
+        "corridas": 47,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "ESTABLE": 45,
+          "RECUPERACION": 1
+        },
+        "hora_cruce_real_umbral": null,
+        "falsas_anomalias": 0,
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 7.3,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 7.3,
+          "hora_primera_alarma": 11.42,
+          "nivel_real_en_la_primera_alarma_cm": 20.0
+        },
+        "ultima_recomendacion": "Nivel estable, sin tendencia de descenso. No se requiere acción."
+      },
+      "fuga_ruido_alto": {
+        "corridas": 59,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "ESTABLE": 7,
+          "DESCENSO_CLIMATICO": 9,
+          "DESCENSO_NO_EXPLICADO": 42
+        },
+        "hora_cruce_real_umbral": 20.52,
+        "hora_inicio_fuga": 8,
+        "hora_primera_deteccion": 9.0,
+        "demora_deteccion_h": 1.0,
+        "anomalias_antes_de_la_fuga": 0,
+        "deteccion_sostenida_pct": 100.0,
+        "error_prediccion_cruce": {
+          "n": 24,
+          "error_abs_medio_h": 2.37,
+          "sesgo_medio_h": 2.36,
+          "anticipacion_0_6h": {
+            "n": 12,
+            "error_abs_medio_h": 0.24,
+            "error_abs_max_h": 0.38
+          },
+          "anticipacion_6_24h": {
+            "n": 12,
+            "error_abs_medio_h": 4.5,
+            "error_abs_max_h": 38.08
+          },
+          "anticipacion_mas_24h": null
+        },
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 38.3,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 6.9,
+          "hora_primera_alarma": 11.42,
+          "nivel_real_en_la_primera_alarma_cm": 14.86
+        },
+        "ultima_recomendacion": "El nivel baja 3.1 mm/h y la evaporación solo explica 0.1 mm/h: hay una pérdida de 3.0 mm/h que el clima no justifica. El nivel ya está bajo el umbral de alerta. Inspeccionar HOY el punto: fugas en la estructura, válvulas abiertas o captaciones no autorizadas."
+      },
+      "sequia_ruido_alto": {
+        "corridas": 143,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "ESTABLE": 7,
+          "DESCENSO_CLIMATICO": 135
+        },
+        "hora_cruce_real_umbral": 57.12,
+        "falsas_anomalias": 0,
+        "error_prediccion_cruce": {
+          "n": 106,
+          "error_abs_medio_h": 10.88,
+          "sesgo_medio_h": 9.65,
+          "anticipacion_0_6h": {
+            "n": 12,
+            "error_abs_medio_h": 7.45,
+            "error_abs_max_h": 8.48
+          },
+          "anticipacion_6_24h": {
+            "n": 36,
+            "error_abs_medio_h": 4.13,
+            "error_abs_max_h": 8.88
+          },
+          "anticipacion_mas_24h": {
+            "n": 58,
+            "error_abs_medio_h": 15.79,
+            "error_abs_max_h": 75.98
+          }
+        },
+        "comparacion_estimadores_24h": {
+          "theil_sen": {
+            "n": 67,
+            "error_abs_medio_h": 5.86,
+            "error_abs_max_h": 15.86,
+            "sesgo_medio_h": 5.44,
+            "tasa_min_mmh": -0.131,
+            "tasa_max_mmh": -0.086
+          },
+          "ciclo": {
+            "n": 67,
+            "error_abs_medio_h": 5.07,
+            "error_abs_max_h": 10.66,
+            "sesgo_medio_h": 5.07,
+            "tasa_min_mmh": -0.122,
+            "tasa_max_mmh": -0.104
+          }
+        },
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 84.1,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 63.5,
+          "hora_primera_alarma": 11.42,
+          "nivel_real_en_la_primera_alarma_cm": 12.49
+        },
+        "ultima_recomendacion": "El nivel baja 0.11 mm/h y la evaporación lo explica: es efecto del clima, no una pérdida. El nivel ya está bajo el umbral de alerta y llegaría al umbral crítico en unos 14 días. Preparar medidas de ahorro y avisar a los usuarios del sistema con anticipación."
+      },
+      "falla": {
+        "corridas": 3,
+        "clasificaciones": {
+          "DATOS_INSUFICIENTES": 1,
+          "ESTABLE": 2
+        },
+        "hora_cruce_real_umbral": null,
+        "falsas_anomalias": 0,
+        "alarma_del_nodo": {
+          "pct_tiempo_en_alarma": 0.0,
+          "pct_tiempo_en_alarma_con_nivel_sobre_umbral": 0.0,
+          "hora_primera_alarma": 1.0,
+          "nivel_real_en_la_primera_alarma_cm": 20.0
+        },
+        "ultima_recomendacion": "Nivel estable, sin tendencia de descenso. No se requiere acción."
+      }
+    }
+  },
+  "entorno": {
+    "fecha_utc": "2026-11-16 16:34:55",
+    "sistema": "Linux 6.18.44-fc-v470 (x86_64)",
+    "python": "3.13.18",
+    "sqlite": "3.53.1",
+    "paho_mqtt": "2.2.0",
+    "broker": "mosquitto version 2.0.18",
+    "ritmo_muestras_por_s": 1500.0,
+    "ventana_s": 300,
+    "tipo_de_validacion": "SIMULACION: nodo ESP32 emulado y nube emulada. Broker, Gateway, SQLite e IA son los reales."
+  }
+}

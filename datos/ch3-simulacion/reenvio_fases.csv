@@ -1,0 +1,5 @@
+fase,lecturas_en_sqlite,agregados_en_sqlite,pendientes_de_envio,agregados_en_nube
+1. Con Internet (4 h),7200,47,0,47
+2. Sin Internet (8 h más),21600,143,118,47
+3. Internet restablecido,21600,143,0,143
+4. Operación normal (2 h más),25200,167,0,167
